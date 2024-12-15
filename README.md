@@ -40,7 +40,11 @@ npx sequelize-cli db:seed:all
 ```bash
 openssl rand -base64 32
 ```
-### Adding Migrations and Seeder
+### Running Project Backend
+```bash
+npm start
+```
+### Example Command Adding Migrations and Seeder
 #### 1. Adding migrations
 ```bash
 npx sequelize-cli migration:generate --name nama_migration
@@ -48,9 +52,4 @@ npx sequelize-cli migration:generate --name nama_migration
 #### 2. Adding seeders
 ```bash
 npx sequelize-cli seed:generate --name nama_seeder
-```
-
-### Running Project Backend
-```bash
-npm start
 ```
