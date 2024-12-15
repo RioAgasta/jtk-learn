@@ -69,6 +69,8 @@ const CourseModal = ({ show, onClose, onSubmit, initialData }) => {
                   className="form-control"
                   value={enrollmentKey}
                   onChange={(e) => setEnrollmentKey(e.target.value)}
+                  minLength="8"
+                  maxLength="12"
                   required
                 />
               </div>
