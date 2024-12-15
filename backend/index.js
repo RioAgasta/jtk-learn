@@ -18,6 +18,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/auth', authRouter);
 app.use('/courses', authenticate, authorizeRole(['pengajar','pelajar']), courseRouter);
 
+// To check authentication
+app.get('/protected-route', authenticate, (req, res) => {
+    res.send('You have access to this route');
+});
+
 /*
     Dibawah merupakan contoh penggunaan middleware
     authenticate digunakan untuk memastikan user login
