@@ -25,7 +25,7 @@ npm install
 ```
 #### 3. Copy .env copy to .env (adjust with the right db name and password)
 ```bash
-copy "./.env copy" env
+copy "./.env copy" .env
 ```
 #### 4. Create db in postgre
 ```bash
@@ -39,6 +39,10 @@ npx sequelize-cli db:seed:all
 #### 6. Create random char to jwt secret key and copy to env
 ```bash
 openssl rand -base64 32
+```
+or use
+```bash
+[convert]::ToBase64String((1..32 | ForEach-Object {Get-Random -Minimum 0 -Maximum 256}))
 ```
 ### Running Project Backend
 ```bash
