@@ -1,55 +1,63 @@
 'use strict';
 const { Model } = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
-  class Course extends Model {
+  class Pengajar extends Model {
     static associate(models) {
-      // Relasi dengan tabel pengajar
-      Course.belongsTo(models.Pengajar, {
-        foreignKey: 'id_pengajar',
-        as: 'pengajar',
+      // Relasi dengan tabel User
+      Pengajar.belongsTo(models.User, {
+        foreignKey: 'id_user',
+        as: 'user',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       });
+      Pengajar.hasMany(models.Course, {
+        foreignKey: 'id_pengajar',
+        as: 'courses', // Alias ini opsional jika digunakan
+      });        
     }
   }
-  Course.init(
+
+  Pengajar.init(
     {
-      id_course: {
+      kode_dosen: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
+        allowNull: false,
       },
-      id_pengajar: {
+      id_user: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-          model: 'pengajar',
-          key: 'kode_dosen',
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE',
       },
-      nama_course: {
+      nip: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: false,
+      },
+      nama: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      enrollment_key: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      gambar_course: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      deskripsi: {
+      alamat: {
         type: DataTypes.TEXT,
         allowNull: true,
+      },
+      jenis_kelamin: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          isIn: [['L', 'P']], // Validasi hanya "L" (Laki-laki) atau "P" (Perempuan)
+        },
       },
     },
     {
       sequelize,
-      modelName: 'Course',
-      tableName: 'course',
-      timestamps: true, // Untuk createdAt dan updatedAt
+      modelName: 'Pengajar',
+      tableName: 'pengajar',
+      timestamps: true,
     }
   );
-  return Course;
+
+  return Pengajar;
 };

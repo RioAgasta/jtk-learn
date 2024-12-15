@@ -6,8 +6,8 @@ module.exports = (sequelize, DataTypes) => {
       // Relasi dengan tabel pengajar
       Course.belongsTo(models.Pengajar, {
         foreignKey: 'id_pengajar',
-        as: 'pengajar',
-      });
+        as: 'pengajar', // Pastikan alias ini sesuai dengan apa yang dipakai di query
+      });      
     }
   }
   Course.init(
