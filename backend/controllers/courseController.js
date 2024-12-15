@@ -66,30 +66,43 @@ const createCourse = async (req, res) => {
 
 // Update course
 const updateCourse = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { id_pengajar, nama_course, enrollment_key, gambar_course, deskripsi } = req.body;
-
-    const course = await Course.findOne({ where: { id_course: id } });
-
-    if (!course) {
-      return res.status(404).json({ message: 'Course not found.' });
+    try {
+      const { id } = req.params;
+      const { id_pengajar, nama_course, enrollment_key, deskripsi } = req.body;
+      const gambar_course = req.file ? req.file.filename : null; // Mendapatkan nama file gambar yang di-upload, jika ada
+  
+      // Cari course berdasarkan ID
+      const course = await Course.findOne({ where: { id_course: id } });
+  
+      if (!course) {
+        return res.status(404).json({ message: 'Course not found.' });
+      }
+  
+      // Jika ada gambar baru yang di-upload, perbarui nama file gambarnya
+      if (gambar_course) {
+        await course.update({
+          id_pengajar,
+          nama_course,
+          enrollment_key,
+          gambar_course,  // Perbarui gambar_course dengan nama file gambar baru
+          deskripsi,
+        });
+      } else {
+        // Jika tidak ada gambar baru, perbarui tanpa mengubah gambar
+        await course.update({
+          id_pengajar,
+          nama_course,
+          enrollment_key,
+          deskripsi,
+        });
+      }
+  
+      res.status(200).json({ message: 'Course updated successfully.', course });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Failed to update the course.' });
     }
-
-    await course.update({
-      id_pengajar,
-      nama_course,
-      enrollment_key,
-      gambar_course,
-      deskripsi,
-    });
-
-    res.status(200).json({ message: 'Course updated successfully.', course });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Failed to update the course.' });
-  }
-};
+  };  
 
 // Delete course
 const deleteCourse = async (req, res) => {
