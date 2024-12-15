@@ -2,7 +2,7 @@
 ### Setup Instructions
 Start by cloning the project repository to your local machine:
 ```bash
-git clone [https://your-repository-url.git](https://github.com/salsabilamp3/jtk-learn.git)
+git clone https://github.com/salsabilamp3/jtk-learn.git
 cd jtk-learn
 ```
 
