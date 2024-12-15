@@ -13,8 +13,8 @@ module.exports = (sequelize, DataTypes) => {
       });
       Pengajar.hasMany(models.Course, {
         foreignKey: 'id_pengajar',
-        as: 'courses', // Alias ini opsional jika digunakan
-      });        
+        as: 'courses',
+      });      
     }
   }
 

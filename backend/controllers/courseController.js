@@ -2,16 +2,21 @@ const { Course, Pengajar } = require('../models'); // Import model
 
 // Get all courses
 const getAllCourses = async (req, res) => {
-  try {
-    const courses = await Course.findAll({
-      include: [{ model: Pengajar, as: 'pengajar' }], // Include pengajar details
-    });
-    res.status(200).json(courses);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Failed to fetch courses.' });
-  }
-};
+    try {
+      const courses = await Course.findAll({
+        include: [
+          {
+            model: Pengajar,
+            as: 'pengajar', // Pastikan sama dengan alias di relasi
+          },
+        ],
+      });
+      res.status(200).json(courses);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: error.message });
+    }
+  };
 
 // Get course by ID
 const getCourseById = async (req, res) => {
