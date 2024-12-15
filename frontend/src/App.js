@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import CourseListPage from './pages/CourseListPage';
 import LoginPage from './pages/LoginPage';
+import ProtectedRoute from './components/ProtectedRoute'; // Import ProtectedRoute
 
 function App() {
   return (
@@ -19,10 +20,12 @@ function App() {
         <Route 
           path="/list-course" 
           element={
-            <>
-              <Navbar />
-              <CourseListPage />
-            </>
+            <ProtectedRoute>
+              <>
+                <Navbar />
+                <CourseListPage />
+              </>
+            </ProtectedRoute>
           }
         />
       </Routes>
