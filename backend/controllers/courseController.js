@@ -49,6 +49,10 @@ const createCourse = async (req, res) => {
         return res.status(400).json({ message: 'Image is required' });
       }
   
+      if (enrollment_key.length < 8 || enrollment_key.length > 12) {
+        return res.status(400).json({ message: 'Enrollment key must be between 8 and 12 characters.' });
+      }
+
       const course = await Course.create({
         id_pengajar,
         nama_course,
@@ -76,6 +80,10 @@ const updateCourse = async (req, res) => {
   
       if (!course) {
         return res.status(404).json({ message: 'Course not found.' });
+      }
+
+      if (enrollment_key.length < 8 || enrollment_key.length > 12) {
+        return res.status(400).json({ message: 'Enrollment key must be between 8 and 12 characters.' });
       }
   
       // Jika ada gambar baru yang di-upload, perbarui nama file gambarnya
