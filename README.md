@@ -40,6 +40,10 @@ npx sequelize-cli db:seed:all
 ```bash
 openssl rand -base64 32
 ```
+or use
+```bash
+[convert]::ToBase64String((1..32 | ForEach-Object {Get-Random -Minimum 0 -Maximum 256}))
+```
 ### Running Project Backend
 ```bash
 npm start
