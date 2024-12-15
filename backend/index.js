@@ -4,6 +4,7 @@ const { authenticate } = require('./middleware/authenticate');
 const { authorizeRole } = require('./middleware/authorizeRole');
 const authRouter = require('./routes/authRoutes'); // Import the auth routes
 const courseRouter = require('./routes/courseRoutes'); // Import the course routes
+const userRouter = require('./routes/userRoutes'); // Import the user routes
 const bodyParser = require('body-parser');
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Use the routers
 app.use('/auth', authRouter);
+app.use('/users', authenticate, userRouter);
 app.use('/courses', authenticate, authorizeRole(['pengajar','pelajar']), courseRouter);
 
 // To check authentication

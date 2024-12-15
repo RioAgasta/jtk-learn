@@ -5,9 +5,10 @@ const sequelize = require('../config/connection'); // Pastikan path sudah sesuai
 const User = require('./user')(sequelize, DataTypes);
 const Course = require('./course')(sequelize, DataTypes);
 const Pengajar = require('./pengajar')(sequelize, DataTypes);
+const Pelajar = require('./pelajar')(sequelize, DataTypes);
 
 // Pastikan asosiasi dijalankan dengan benar
-const models = { User, Course, Pengajar };
+const models = { User, Course, Pengajar, Pelajar };
 
 // Panggil method `associate` pada setiap model jika ada
 Object.keys(models).forEach((modelName) => {

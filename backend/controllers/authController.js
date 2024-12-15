@@ -2,7 +2,6 @@ const { User } = require('../models');
 const bcrypt = require('bcrypt');  // or 'bcryptjs'
 const jwt = require('jsonwebtoken');
 
-// Login controller function
 const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -28,21 +27,22 @@ const login = async (req, res) => {
       { expiresIn: '1h' } // Token expires in 1 hour
     );
 
-    // Send the token in the response or store in a cookie
-    // Optionally store the JWT in an HttpOnly cookie for more secure handling on the client-side
-    res.cookie('token', token, {
-      httpOnly: true, // Prevents JS access to the cookie
-      secure: process.env.NODE_ENV === 'production', // Set cookie to be sent only over HTTPS in production
-      maxAge: 3600000 // Set cookie expiration to match token expiration (1 hour)
+    // Send response with user data and token
+    res.json({
+      token,
+      user: {
+        id_user: user.id_user,
+        email: user.email,
+        role: user.role,
+        name: user.name, // Include name or other fields if available
+      },
     });
-
-    // Send response with the token (if you're not using cookies)
-    res.json({ token }); // You can send the token in the response body
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
 
 // Logout function (clear JWT token from cookies)
 const logout = (req, res) => {
