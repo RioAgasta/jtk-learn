@@ -1,4 +1,5 @@
 const { Course, Pengajar } = require('../models'); // Import model
+const upload = require('../middleware/upload')
 
 // Get all courses
 const getAllCourses = async (req, res) => {
@@ -38,25 +39,30 @@ const getCourseById = async (req, res) => {
   }
 };
 
-// Create a new course
+// Create a new course with image upload
 const createCourse = async (req, res) => {
-  try {
-    const { id_pengajar, nama_course, enrollment_key, gambar_course, deskripsi } = req.body;
-
-    const course = await Course.create({
-      id_pengajar,
-      nama_course,
-      enrollment_key,
-      gambar_course,
-      deskripsi,
-    });
-
-    res.status(201).json({ message: 'Course created successfully.', course });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Failed to create the course.' });
-  }
-};
+    try {
+      const { id_pengajar, nama_course, enrollment_key, deskripsi } = req.body;
+      const gambar_course = req.file ? req.file.filename : null; // Mendapatkan nama file gambar yang di-upload
+  
+      if (!gambar_course) {
+        return res.status(400).json({ message: 'Image is required' });
+      }
+  
+      const course = await Course.create({
+        id_pengajar,
+        nama_course,
+        enrollment_key,
+        gambar_course, // Simpan nama file gambar di DB
+        deskripsi,
+      });
+  
+      res.status(201).json({ message: 'Course created successfully.', course });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Failed to create the course.' });
+    }
+  };
 
 // Update course
 const updateCourse = async (req, res) => {
