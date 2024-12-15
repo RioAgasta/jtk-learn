@@ -57,3 +57,35 @@ npx sequelize-cli migration:generate --name nama_migration
 ```bash
 npx sequelize-cli seed:generate --name nama_seeder
 ```
+
+## Frontend
+The frontend of this project is built with ReactJS (version 19.0.0) and styled using Bootstrap (version 5.3.3), along with Bootstrap Icons for additional iconography.
+### Prerequisites
+Before running the backend, make sure you have the following installed:
+- **npm** or **yarn**
+### Setup Instructions
+#### 1. Open backend folder
+Start by open frontend folder
+```bash
+cd frontend
+```
+#### 2. Install dependencies
+```bash
+npm install
+```
+#### 3. Copy .env copy to .env (adjust the port you'll be using)
+```bash
+copy "./.env copy" .env
+```
+### Running Project Frontend
+```bash
+npm start
+```
+### Customizing styling
+If you want to add custom css, you can add css file here
+```
+frontend
+├───public
+│   ├───styles
+│   │   └───(your .css here).css
+```
