@@ -3,6 +3,7 @@ const cors = require('cors'); // Import cors
 const { authenticate } = require('./middleware/authenticate');
 const authRouter = require('./routes/authRoutes'); // Import the auth routes
 const courseRouter = require('./routes/courseRoutes'); // Import the course routes
+const bodyParser = require('body-parser');
 const app = express();
 
 // Enable CORS for all routes
@@ -10,6 +11,9 @@ app.use(cors());
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Use the routers
 app.use('/auth', authRouter);
