@@ -7,39 +7,45 @@ import api from '../services/api';
 
 const CourseList = () => {
   const [showModal, setShowModal] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentCourse, setCurrentCourse] = useState(null);
   const [courseList, setCourseList] = useState([]);
   const [loading, setLoading] = useState(true);
   const token = localStorage.getItem('token');
   const idPengajar = localStorage.getItem('idPengajar');
 
+  const fetchCourses = async () => {
+    try {
+      const response = await api.get('/courses', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const filteredCourses = response.data.filter(
+        (course) => course.id_pengajar.toString() === idPengajar
+      );
+
+      const mappedCourses = filteredCourses.map((course) => ({
+        id: course.id_course,
+        title: course.nama_course,
+        description: course.deskripsi,
+        enrollmentKey: course.enrollment_key,
+        author: course.pengajar.nama,
+        image: `/uploads/images/${course.gambar_course}`,
+      }));
+
+      setCourseList(mappedCourses);
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+      Swal.fire('Error', 'Failed to fetch courses. Please try again later.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const response = await api.get('/courses', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        // Map the response data to match the component's expected structure
-        const mappedCourses = response.data.map((course) => ({
-          id: course.id_course,
-          title: course.nama_course,
-          author: course.pengajar.nama,
-          image: `/uploads/images/${course.gambar_course}`, // Update with actual path handling if necessary
-        }));
-
-        setCourseList(mappedCourses);
-      } catch (error) {
-        console.error('Error fetching courses:', error);
-        Swal.fire('Error', 'Failed to fetch courses. Please try again later.', 'error');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchCourses();
-    console.log('courses: ', courseList);
   }, []);
 
 
@@ -69,15 +75,41 @@ const CourseList = () => {
         },
       });
   
-      // Tambahkan course baru ke daftar lokal
-      setCourseList([...courseList, response.data]);
+      fetchCourses();
     } catch (error) {
       console.error('Error adding course:', error);
     }
   };
-  
 
-  const handleDeleteCourse = (id) => {
+  const handleEditCourse = async (updatedCourse) => {
+    try {
+      const formData = new FormData();
+      formData.append('nama_course', updatedCourse.courseName);
+      formData.append('enrollment_key', updatedCourse.enrollmentKey);
+      formData.append('deskripsi', updatedCourse.description);
+  
+      if (updatedCourse.image) {
+        // Jika pengguna memilih gambar baru, tambahkan ke FormData
+        formData.append('gambar_course', updatedCourse.image);
+      } else if (updatedCourse.currentImage) {
+        // Jika tidak ada gambar baru, gunakan gambar awal
+        formData.append('gambar_course', updatedCourse.currentImage);
+      }
+  
+      await api.put(`/courses/${currentCourse.id}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+  
+      fetchCourses();
+    } catch (error) {
+      console.error('Error updating course:', error);
+    }
+  };
+  
+  const handleDeleteCourse = async (id) => {
     Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -86,20 +118,51 @@ const CourseList = () => {
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes, delete it!',
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
-        // Logic to delete the course
-        console.log('Deleted course with ID:', id);
-        Swal.fire('Deleted!', 'The course has been deleted.', 'success');
+        try {
+          const response = await api.delete(`/courses/${id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+  
+          if (response.status === 200) {
+            // Hapus course dari state lokal
+            setCourseList((prevCourses) =>
+              prevCourses.filter((course) => course.id !== id)
+            );
+  
+            Swal.fire('Deleted!', 'The course has been deleted.', 'success');
+          } else {
+            throw new Error('Failed to delete the course.');
+          }
+        } catch (error) {
+          console.error('Error deleting course:', error);
+          Swal.fire('Error', 'Failed to delete the course. Please try again later.', 'error');
+        }
       }
     });
+  };
+
+  const openEditModal = (course) => {
+    setCurrentCourse(course);
+    setIsEditing(true);
+    setShowModal(true);
   };
 
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h3 className="fw-bold mb-0">Courses</h3>
-        <button className="btn btn-primary" onClick={() => setShowModal(true)}>
+        <button
+          className="btn btn-primary"
+          onClick={() => {
+            setCurrentCourse(null);
+            setIsEditing(false);
+            setShowModal(true);
+          }}
+        >
           + Course
         </button>
       </div>
@@ -107,6 +170,12 @@ const CourseList = () => {
         {courseList.map((course) => (
           <div key={course.id} className="col-md-3 mb-4">
             <div className="card h-100 shadow-sm position-relative">
+              <button
+                  className="btn btn-sm btn-warning position-absolute top-0 end-0 m-2 me-5"
+                  onClick={() => openEditModal(course)}
+                >
+                  <i className="bi bi-pencil"></i>
+              </button>
               <button
                 className="btn btn-sm btn-danger position-absolute top-0 end-0 m-2"
                 onClick={() => handleDeleteCourse(course.id)}
@@ -130,7 +199,8 @@ const CourseList = () => {
       <CourseModal
         show={showModal}
         onClose={() => setShowModal(false)}
-        onSubmit={handleAddCourse}
+        onSubmit={isEditing ? handleEditCourse : handleAddCourse}
+        initialData={currentCourse}
       />
     </div>
   );

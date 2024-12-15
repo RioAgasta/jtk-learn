@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
-const CourseModal = ({ show, onClose, onSubmit }) => {
+const CourseModal = ({ show, onClose, onSubmit, initialData }) => {
   const [courseName, setCourseName] = useState('');
   const [description, setDescription] = useState('');
   const [enrollmentKey, setEnrollmentKey] = useState('');
   const [image, setImage] = useState(null);
+
+  useEffect(() => {
+    if (initialData) {
+      setCourseName(initialData.title || '');
+      setDescription(initialData.description || '');
+      setEnrollmentKey(initialData.enrollmentKey || '');
+      setImage(initialData.image || null);
+    }
+  }, [initialData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -12,18 +21,23 @@ const CourseModal = ({ show, onClose, onSubmit }) => {
       courseName,
       description,
       enrollmentKey,
-      image,
+      image: image instanceof File ? image : null,
+      currentImage: initialData?.image || null,
     };
     onSubmit(formData);
     onClose();
   };
 
   return (
-    <div className={`modal fade ${show ? 'show d-block' : ''}`} tabIndex="-1" style={show ? { backgroundColor: 'rgba(0,0,0,0.5)' } : {}}>
+    <div
+      className={`modal fade ${show ? 'show d-block' : ''}`}
+      tabIndex="-1"
+      style={show ? { backgroundColor: 'rgba(0,0,0,0.5)' } : {}}
+    >
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">Add New Course</h5>
+            <h5 className="modal-title">{initialData ? 'Edit Course' : 'Add New Course'}</h5>
             <button type="button" className="btn-close" onClick={onClose}></button>
           </div>
           <div className="modal-body">
@@ -67,7 +81,7 @@ const CourseModal = ({ show, onClose, onSubmit }) => {
                 />
               </div>
               <button type="submit" className="btn btn-primary">
-                Save Course
+                {initialData ? 'Update Course' : 'Save Course'}
               </button>
             </form>
           </div>
