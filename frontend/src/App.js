@@ -2,8 +2,9 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import CourseListPage from './pages/CourseListPage';
+import DashboardPelajar from './pages/DashboardPelajarPage';
 import LoginPage from './pages/LoginPage';
-import ProtectedRoute from './components/ProtectedRoute'; // Import ProtectedRoute
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -24,6 +25,17 @@ function App() {
               <>
                 <Navbar />
                 <CourseListPage />
+              </>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <>
+                <Navbar />
+                <DashboardPelajar />
               </>
             </ProtectedRoute>
           }

@@ -23,9 +23,11 @@ const LoginPage = () => {
       localStorage.setItem('token', data.token);
       if(data.user.role === 'pengajar') {
         localStorage.setItem('idPengajar', data.user.userData.kode_dosen)
+        navigate('/list-course');
+      } else {
+        navigate('/dashboard');
       }
       localStorage.setItem('nama', data.user.userData.nama);
-      navigate('/list-course');
     } catch (error) {
       console.log('error login: ', error)
       Swal.fire({
