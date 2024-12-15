@@ -4,13 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
 const LoginPage = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleUsernameChange = (e) => {
-    setUsername(e.target.value);
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
   };
 
   const handlePasswordChange = (e) => {
@@ -20,18 +19,20 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await api.post('/auth/login', { username, password });
+      const { data } = await api.post('/auth/login', { email, password });
       localStorage.setItem('token', data.token);
-      alert('Login successful!');
-      navigate('/');
+      Swal.fire({
+        icon: 'success',
+        title: 'Login Successful',
+        text: 'You are now logged in!',
+      });
+      navigate('/list-course');
     } catch (error) {
-        setError('Login gagal. Username atau password salah.');
-
-        Swal.fire({
-          icon: 'error',
-          title: 'Login Failed',
-          text: 'Username or password is incorrect!',
-        });
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: 'Email or password is incorrect!',
+      });
     }
   };
 
@@ -50,18 +51,19 @@ const LoginPage = () => {
   
                     <form onSubmit={handleSubmit} className="row g-3 needs-validation" noValidate>
                       <div className="col-12">
-                        <label htmlFor="yourUsername" className="form-label">
-                          Username
+                        <label htmlFor="yourEmail" className="form-label">
+                          Email
                         </label>
                         <div className="input-group has-validation">
                           <input
                             className="form-control form-control-lg"
-                            type="text"
-                            placeholder="Masukkan username Anda"
-                            value={username}
-                            onChange={handleUsernameChange}
+                            type="email"
+                            placeholder="Masukkan email Anda"
+                            value={email}
+                            onChange={handleEmailChange}
+                            required
                           />
-                          <div className="invalid-feedback">Please enter your username.</div>
+                          <div className="invalid-feedback">Please enter your email.</div>
                         </div>
                       </div>
   
@@ -75,6 +77,7 @@ const LoginPage = () => {
                           placeholder="Masukkan password Anda"
                           value={password}
                           onChange={handlePasswordChange}
+                          required
                         />
                         <div className="invalid-feedback">Please enter your password!</div>
                       </div>
