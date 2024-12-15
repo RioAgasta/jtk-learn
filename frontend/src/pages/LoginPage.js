@@ -21,16 +21,10 @@ const LoginPage = () => {
     try {
       const { data } = await api.post('/auth/login', { email, password });
       localStorage.setItem('token', data.token);
-      // const response = api.get('/users/data', {
-      //   headers: {
-      //     Authorization: `Bearer ${data.token}`,
-      //   },
-      // });
-      // console.log('userdata:', response.data)
-      // if(data.user.role === 'pengajar') {
-      //   localStorage.setItem('idPengajar', response.data.kode_dosen)
-      // }
-      // localStorage.setItem('nama', response.data.nama);
+      if(data.user.role === 'pengajar') {
+        localStorage.setItem('idPengajar', data.user.userData.kode_dosen)
+      }
+      localStorage.setItem('nama', data.user.userData.nama);
       navigate('/list-course');
     } catch (error) {
       console.log('error login: ', error)

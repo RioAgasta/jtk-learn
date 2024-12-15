@@ -9,34 +9,24 @@ const CourseList = () => {
   const [showModal, setShowModal] = useState(false);
   const [courseList, setCourseList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [idPengajar, setIdPengajar] = useState(null);
   const token = localStorage.getItem('token');
+  const idPengajar = localStorage.getItem('idPengajar');
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        // Fetch user data to get idPengajar
-        const userResponse = await api.get('/users/data', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-  
-          setIdPengajar(userResponse.data.data.kode_dosen); 
-  
-          // Fetch courses based on idPengajar
-          const courseResponse = await api.get('/courses', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
+        const response = await api.get('/courses', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         // Map the response data to match the component's expected structure
-        const mappedCourses = courseResponse.data.map((course) => ({
+        const mappedCourses = response.data.map((course) => ({
           id: course.id_course,
           title: course.nama_course,
           author: course.pengajar.nama,
-          image: `/uploads/${course.gambar_course}`, // Update with actual path handling if necessary
+          image: `/uploads/images/${course.gambar_course}`, // Update with actual path handling if necessary
         }));
 
         setCourseList(mappedCourses);
@@ -50,7 +40,6 @@ const CourseList = () => {
 
     fetchCourses();
     console.log('courses: ', courseList);
-    console.log('idPengajar: ', idPengajar);
   }, []);
 
 
@@ -73,7 +62,7 @@ const CourseList = () => {
       console.log('formData: ', formData);
   
       // Kirim POST request dengan FormData
-      const response = await axios.post('/courses', formData, {
+      const response = await api.post('/courses', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data', // Header untuk FormData
