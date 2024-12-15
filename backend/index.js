@@ -1,12 +1,19 @@
 const express = require('express');
+const cors = require('cors'); // Import cors
 const { authenticate } = require('./middleware/authenticate');
-const authRouter = require('./routes/auth'); // Import the auth routes
+const authRouter = require('./routes/authRoutes'); // Import the auth routes
+const courseRouter = require('./routes/courseRoutes'); // Import the course routes
 const app = express();
 
-app.use(express.json()); // Middleware to parse JSON bodies
+// Enable CORS for all routes
+app.use(cors());
 
-// Use the authentication routes
-app.use('/auth', authRouter); 
+// Middleware to parse JSON bodies
+app.use(express.json());
+
+// Use the routers
+app.use('/auth', authRouter);
+app.use('/courses', authenticate, courseRouter);
 
 // Protected route example
 app.get('/protected-route', authenticate, (req, res) => {
