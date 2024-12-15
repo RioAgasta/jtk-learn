@@ -1,32 +1,92 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import CourseModal from '../components/AddCourseModal';
 import Swal from 'sweetalert2';
 import 'bootstrap-icons/font/bootstrap-icons.css';
-
-const courses = [
-  { id: 1, title: 'Dasar-dasar Pemrograman', author: 'Najib Alimudin, Ph.D.', image: 'https://via.placeholder.com/300x150' },
-  { id: 2, title: 'Struktur Data dan Algoritma', author: 'Najib Alimudin, Ph.D.', image: 'https://via.placeholder.com/300x150' },
-  { id: 3, title: 'Komputasi Kognitif', author: 'Najib Alimudin, Ph.D.', image: 'https://via.placeholder.com/300x150' },
-  { id: 4, title: 'Sistem Basis Data', author: 'Najib Alimudin, Ph.D.', image: 'https://via.placeholder.com/300x150' },
-  { id: 5, title: 'Prinsip Bahasa Pemrograman', author: 'Najib Alimudin, Ph.D.', image: 'https://via.placeholder.com/300x150' },
-  { id: 6, title: 'Sistem Operasi', author: 'Najib Alimudin, Ph.D.', image: 'https://via.placeholder.com/300x150' },
-  { id: 7, title: 'Komunikasi Data dan Jaringan', author: 'Najib Alimudin, Ph.D.', image: 'https://via.placeholder.com/300x150' },
-  { id: 8, title: 'Matematika Diskrit', author: 'Najib Alimudin, Ph.D.', image: 'https://via.placeholder.com/300x150' }
-];
+import api from '../services/api';
 
 const CourseList = () => {
   const [showModal, setShowModal] = useState(false);
-  const [courseList, setCourseList] = useState(courses);
+  const [courseList, setCourseList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [idPengajar, setIdPengajar] = useState(null);
+  const token = localStorage.getItem('token');
 
-  const handleAddCourse = (newCourse) => {
-    const newCourseData = {
-      id: courseList.length + 1,
-      title: newCourse.courseName,
-      author: 'Najib Alimudin, Ph.D.',
-      image: newCourse.image ? URL.createObjectURL(newCourse.image) : 'https://via.placeholder.com/300x150',
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        // Fetch user data to get idPengajar
+        const userResponse = await api.get('/users/data', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+  
+          setIdPengajar(userResponse.data.data.kode_dosen); 
+  
+          // Fetch courses based on idPengajar
+          const courseResponse = await api.get('/courses', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+        // Map the response data to match the component's expected structure
+        const mappedCourses = courseResponse.data.map((course) => ({
+          id: course.id_course,
+          title: course.nama_course,
+          author: course.pengajar.nama,
+          image: `/uploads/${course.gambar_course}`, // Update with actual path handling if necessary
+        }));
+
+        setCourseList(mappedCourses);
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+        Swal.fire('Error', 'Failed to fetch courses. Please try again later.', 'error');
+      } finally {
+        setLoading(false);
+      }
     };
-    setCourseList([...courseList, newCourseData]);
+
+    fetchCourses();
+    console.log('courses: ', courseList);
+    console.log('idPengajar: ', idPengajar);
+  }, []);
+
+
+  const handleAddCourse = async (newCourse) => {
+    try {
+      // Buat FormData untuk mengirimkan data termasuk gambar
+      const formData = new FormData();
+      formData.append('id_pengajar', idPengajar);
+      formData.append('nama_course', newCourse.courseName);
+      formData.append('enrollment_key', newCourse.enrollmentKey);
+      formData.append('deskripsi', newCourse.description);
+  
+      // Tambahkan gambar jika ada, jika tidak gunakan default
+      if (newCourse.image) {
+        formData.append('gambar_course', newCourse.image); // tambahkan file gambar
+      } else {
+        formData.append('gambar_course', 'default.jpg'); // nama file default
+      }
+
+      console.log('formData: ', formData);
+  
+      // Kirim POST request dengan FormData
+      const response = await axios.post('/courses', formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data', // Header untuk FormData
+        },
+      });
+  
+      // Tambahkan course baru ke daftar lokal
+      setCourseList([...courseList, response.data]);
+    } catch (error) {
+      console.error('Error adding course:', error);
+    }
   };
+  
 
   const handleDeleteCourse = (id) => {
     Swal.fire({
@@ -58,7 +118,6 @@ const CourseList = () => {
         {courseList.map((course) => (
           <div key={course.id} className="col-md-3 mb-4">
             <div className="card h-100 shadow-sm position-relative">
-              {/* Icon delete */}
               <button
                 className="btn btn-sm btn-danger position-absolute top-0 end-0 m-2"
                 onClick={() => handleDeleteCourse(course.id)}
@@ -67,7 +126,7 @@ const CourseList = () => {
               </button>
               <img
                 src={course.image}
-                className="card-img-top"
+                className="card-img-top fixed-image"
                 alt={course.title}
               />
               <div className="card-body">
