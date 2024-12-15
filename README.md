@@ -25,7 +25,7 @@ npm install
 ```
 #### 3. Copy .env copy to .env (adjust with the right db name and password)
 ```bash
-copy "./.env copy" env
+copy "./.env copy" .env
 ```
 #### 4. Create db in postgre
 ```bash
