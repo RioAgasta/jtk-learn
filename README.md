@@ -50,3 +50,7 @@ npx sequelize-cli migration:generate --name nama_migration
 npx sequelize-cli seed:generate --name nama_seeder
 ```
 
+### Running Project Backend
+```bash
+npm start
+```
