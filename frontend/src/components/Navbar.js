@@ -7,6 +7,7 @@ const Navbar = () => {
   const handleLogout = () => {
     // Hapus token dari localStorage
     localStorage.removeItem('token');
+    localStorage.getItem('idPengajar') && localStorage.removeItem('idPengajar');
     // Arahkan ke halaman login
     navigate('/');
   };
